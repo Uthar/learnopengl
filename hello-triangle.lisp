@@ -36,11 +36,19 @@
 
 (defvar *display*)
 
-(defparameter vertices (gl-array :float (vector 0.0  0.2 -1.0
-                                                0.2 -0.5 0.0
-                                                -0.7 -0.5 1.0)))
+(defparameter vertices (gl-array :float (vector  0.5  0.5 0.0
+                                                 0.5  0.0 0.0
+                                                 0.0  0.0 0.0
+                                                 0.0  0.5 0.0
+                                                )))
+
+(defparameter indices (gl-array :unsigned-int (vector  0 1 2
+                                                       2 3 0
+                                                )))
+
 (defparameter vbo nil)
 (defparameter vao nil)
+(defparameter ebo nil)
 
 ;; My GPU supports only OpenGL 3.0 and GLSL 1.3
 
@@ -78,7 +86,9 @@
   ;; them through the shaders as configured in `main`
   (gl:use-program shader-program)
   (gl:bind-vertex-array vao)
-  (gl:draw-arrays :triangles 0 3)
+  (gl:polygon-mode :front-and-back :line)
+  (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-int) :count 6)
+  (gl:bind-vertex-array 0)
 
   (al:flip-display))
 
@@ -102,8 +112,10 @@
          ;;
          ;; The VBO stores my vertex data in GPU memory
          ;; The VAO remembers VBO's configuration, e.g. vertex attribute pointers
+         ;; The EBO stores indices of order in which to draw VBO vertices - prevent duplicates
          (setf vbo (gl:gen-buffer))
          (setf vao (gl:gen-vertex-array))
+         (setf ebo (gl:gen-buffer))
 
          ;; Remember VBO configuration when the VAO will be bound in the future
          (gl:bind-vertex-array vao)
@@ -111,6 +123,10 @@
          ;; Copy the vertex data to GPU memory
          (gl:bind-buffer :array-buffer vbo)
          (gl:buffer-data :array-buffer :static-draw vertices)
+
+         ;; Copy the indices
+         (gl:bind-buffer :element-array-buffer ebo)
+         (gl:buffer-data :element-array-buffer :static-draw indices)
 
          ;; Setup the vertex shader
          ;;
@@ -145,8 +161,13 @@
          ;;
          ;; This teaches OpenGL how to pass the input vertex data as
          ;; arguments to the vertex shader.
-         (gl:vertex-attrib-pointer 0 3 :float nil 0 (cffi:null-pointer))
+         (gl:vertex-attrib-pointer 0 3 :float nil (* 3 (cffi:foreign-type-size :float)) (cffi:null-pointer))
          (gl:enable-vertex-attrib-array 0)
+
+         ;; Unbind things
+         (gl:bind-vertex-array 0)
+         (gl:bind-buffer :element-array-buffer 0)
+         (gl:bind-buffer :array-buffer 0)
 
          (mainloop))
     (destroy-display *display*)))
