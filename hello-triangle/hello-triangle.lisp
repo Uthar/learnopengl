@@ -1,54 +1,4 @@
-(require :asdf)
-(asdf:load-system :cl-liballegro)
-(asdf:load-system :cl-opengl)
-
-;;;;
-;;;; Glue utils
-;;;;
-
-(defun init-display (&key (x 800) (y 600))
-  (al:init)
-  (al:init-primitives-addon)
-  (al:set-new-display-flags '(:windowed :resizable :opengl))
-  (al:set-new-display-option :vsync 0 :require)
-  (al:create-display x y))
-
-(defun destroy-display (display)
-  (al:destroy-display display)
-  (al:uninstall-system))
-
-(defmacro with-display (&body body)
-  `(progn
-     #+swank (al:set-target-backbuffer *display*)
-     ,@body))
-
-(defun gl-array (type elems)
-  (check-type elems vector)
-  (let ((arr (gl:alloc-gl-array type (length elems))))
-    (dotimes (i (length elems))
-      (setf (gl:glaref arr i) (aref elems i)))
-    arr))
-
-
-;;;;
-;;;; Proper code
-;;;;
-
-(defvar *display*)
-
-(defparameter vertices (gl-array :float (vector  0.5  0.5 0.0
-                                                 0.5  0.0 0.0
-                                                 0.0  0.0 0.0
-                                                 0.0  0.5 0.0
-                                                )))
-
-(defparameter indices (gl-array :unsigned-int (vector  0 1 2
-                                                       2 3 0
-                                                )))
-
-(defparameter vbo nil)
-(defparameter vao nil)
-(defparameter ebo nil)
+(in-package :learnopengl)
 
 ;; My GPU supports only OpenGL 3.0 and GLSL 1.3
 
@@ -76,6 +26,10 @@
 (defparameter fs nil)
 (defparameter shader-program nil)
 
+(defparameter vbo nil)
+(defparameter vao nil)
+(defparameter ebo nil)
+
 (defun render ()
 
   ;; Draw a background
@@ -96,6 +50,18 @@
   (loop
     (funcall 'render)
     (sleep 1/30)))
+
+(defvar *display*)
+
+(defparameter vertices (gl-array :float (vector  0.5  0.5 0.0
+                                                 0.5  0.0 0.0
+                                                 0.0  0.0 0.0
+                                                 0.0  0.5 0.0
+                                                )))
+
+(defparameter indices (gl-array :unsigned-int (vector  0 1 2
+                                                       2 3 0
+                                                )))
 
 (defun main ()
   (unwind-protect
