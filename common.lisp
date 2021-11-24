@@ -1,5 +1,5 @@
 (defpackage :learnopengl
-  (:use :cl))
+  (:use :cl :3d-matrices :3d-vectors))
 
 (in-package :learnopengl)
 
@@ -29,4 +29,31 @@
     (dotimes (i (length elems))
       (setf (gl:glaref arr i) (aref elems i)))
     arr))
+
+(declaim (inline degree->radian radian->degree)
+         (ftype (function (single-float) single-float) degree->radian radian->degree))
+
+(defun degree->radian (degree)
+  (declare (optimize speed))
+  (coerce (* degree (/ pi 180)) 'single-float))
+
+(defun radian->degree (radian)
+  (declare (optimize speed))
+  (coerce (* radian (/ 180 pi)) 'single-float))
+
+(defmacro -> (&body forms)
+  (reduce (lambda (expansion form)
+            (if (consp form)
+                (append (list (first form))
+                        (list expansion)
+                        (rest form))
+                (append (list form) (list expansion))))
+          forms))
+
+(defmacro ->> (&body forms)
+  (reduce (lambda (expansion form)
+            (if (consp form)
+                (append form (list expansion))
+                (append (list form) (list expansion))))
+          forms))
 

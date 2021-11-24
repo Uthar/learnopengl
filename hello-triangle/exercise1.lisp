@@ -6,14 +6,20 @@
 
 in vec3 pos;
 
+out vec4 fragPos;
+
+uniform mat4 thing;
+
 void main() {
-  gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);
+  fragPos = thing * vec4(pos, 1.0);
+  gl_Position = fragPos;
 }
 ")
 
 (defparameter fs-source "
 #version 130
 
+in vec4 fragPos;
 out vec4 fragColor;
 
 void main() {
@@ -38,6 +44,35 @@ void main() {
 
 (defparameter display nil)
 
+(defparameter running t)
+
+(defun render ()
+  (gl:clear-color 0.2 0.4 0.6 1.0)
+  (gl:clear :color-buffer-bit)
+
+  (gl:use-program program)
+
+  (->>
+    (m* 
+     (mtranslation (vec 0.0 0.0 0.0))
+     (mrotation +vy+ (degree->radian (coerce (* 60 (* 2 (1+ (sin (al:get-time))))) 'single-float)))
+     (mrotation +vx+ (degree->radian (coerce (* 60 (* 2 (1+ (cos (al:get-time))))) 'single-float)))
+     (mrotation +vz+ (degree->radian (coerce (* 60 (* 2 (1+ (sin (al:get-time))))) 'single-float)))
+     ;; (mrotation +vx+ (degree->radian 50.0))
+     (mscaling (vec 1.0 1.0 1.0)))
+    marr
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "thing")))
+
+  (gl:bind-vertex-array vao)
+
+  ;; Draw both triangles
+  (gl:draw-arrays :triangles 0 6)
+
+  (al:flip-display)
+
+  (sleep 1/30))
+
+
 (defun run-example ()
 
   (unwind-protect
@@ -57,7 +92,7 @@ void main() {
          (gl:compile-shader fs)
          (format t "~a~%" (gl:get-shader-info-log fs))
          (unless (gl:get-shader fs :compile-status)
-           (error "Error compiling shader"))
+           (error "Error compiling shader")))
 
          (setf program (gl:create-program))
          (gl:attach-shader program vs)
@@ -82,24 +117,14 @@ void main() {
 
          ;; Draw the stuff
 
-         (gl:clear-color 0.2 0.4 0.6 1.0)
-         (gl:clear :color-buffer-bit)
-
-         (gl:use-program program)
-
-         (gl:bind-vertex-array vao)
-
-         ;; Draw both triangles
-         (gl:draw-arrays :triangles 0 6)
-
-         (al:flip-display)
-
-         (sleep 5)
+    (loop while running do
+      (with-simple-restart (next-iteration "Continue with the next iteration of the main loop")
+        (funcall 'render)))
 
          )
 
-    (gl:delete-vertex-arrays (list vao1 vao2))
-    (gl:delete-buffers (list vbo1 vbo2))
+    (gl:delete-vertex-arrays (list vao))
+    (gl:delete-buffers (list vbo))
     (gl:delete-program program)
     (destroy-display display)
     (al:uninstall-system)))
