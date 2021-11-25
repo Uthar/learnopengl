@@ -12,6 +12,13 @@
   (al:init-primitives-addon)
   (al:set-new-display-flags '(:windowed :resizable :opengl))
   (al:set-new-display-option :vsync 0 :require)
+
+  ;; OpenGL does not guarantee a depth buffer by default.
+  ;;
+  ;; This is required to prevent drawing over textures that are behind
+  ;; others (i.e. to make glClear(GL_DEPTH_BUFFER_BIT) work)
+  (al:set-new-display-option :depth-size 16 :require)
+
   (al:create-display x y))
 
 (defun destroy-display (display)
