@@ -79,9 +79,9 @@ void main() {
 
   (gl:bind-vertex-array vao)
 
-  ;; Draw both triangles
-  (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-int) :count 20)
-  ;; (gl:draw-arrays :triangles 0 12)
+  (gl:draw-elements :triangles
+                    (gl:make-null-gl-array :unsigned-int)
+                    :count (slot-value indices 'gl::size))
 
   (al:flip-display)
 
@@ -169,7 +169,7 @@ void main() {
              (funcall 'render))))
 
     (gl:delete-vertex-arrays (list vao))
-    (gl:delete-buffers (list vbo))
+    (gl:delete-buffers (list vbo ebo))
     (gl:delete-program program)
     (destroy-display display)
     (al:uninstall-system)))
