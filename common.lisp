@@ -17,7 +17,7 @@
   ;;
   ;; This is required to prevent drawing over textures that are behind
   ;; others (i.e. to make glClear(GL_DEPTH_BUFFER_BIT) work)
-  (al:set-new-display-option :depth-size 16 :require)
+  (al:set-new-display-option :depth-size 16 :suggest)
 
   (al:create-display x y))
 
