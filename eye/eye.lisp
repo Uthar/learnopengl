@@ -64,9 +64,9 @@ void main() {
   (gl:use-program program)
 
   (->>
-    (m* 
-     (mtranslation (vec 0.2
-                        (- (* 0.25 (sin (al:get-time))) 0.3)
+    (m*
+     (mtranslation (vec -0.0
+                        (- (* 0.25 (sin (al:get-time))) 0.4)
                         0.0))
      (mrotation +vx+ (degree->radian (coerce (* 30 (sin (al:get-time))) 'single-float)))
      (mrotation +vy+ (degree->radian (* 25 (coerce (al:get-time) 'single-float))))
@@ -78,6 +78,21 @@ void main() {
   (gl:bind-texture :texture-2d pyramid-texture)
 
   (gl:bind-vertex-array vao)
+
+  (gl:draw-elements :triangles
+                    (gl:make-null-gl-array :unsigned-int)
+                    :count (slot-value indices 'gl::size))
+  (->>
+    (m*
+     (mtranslation (vec 0.0
+                        (+ 0.6 (- (* 0.25 (sin (al:get-time))) 0.3))
+                        0.5))
+     (mrotation +vx+ (degree->radian (coerce (* 30 (sin (al:get-time))) 'single-float)))
+     (mrotation +vy+ (- (degree->radian (* 25 (coerce (al:get-time) 'single-float)))))
+     (mrotation +vz+ (degree->radian -15.0))
+     (mscaling (vec 0.6 0.6 0.6)))
+    marr
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "thing")))
 
   (gl:draw-elements :triangles
                     (gl:make-null-gl-array :unsigned-int)
