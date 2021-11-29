@@ -140,8 +140,8 @@ void main() {
     (case keycode
       (:up    (nv+ camera-position (v* (v- camera-direction) camera-speed)))
       (:down  (nv- camera-position (v* (v- camera-direction) camera-speed)))
-      (:left  (nv- camera-position (v* (vunit (vc (vec3 0 1 0) camera-position)) camera-speed)))
-      (:right (nv+ camera-position (v* (vunit (vc (vec3 0 1 0) camera-position)) camera-speed)))
+      (:left  (nv+ camera-position (v* (vunit (vc camera-direction (vec3 0 1 0))) camera-speed)))
+      (:right (nv- camera-position (v* (vunit (vc camera-direction (vec3 0 1 0))) camera-speed)))
       (:escape (progn
                  (al:set-mouse-xy display 400 300)
                  (setf first-mouse t
