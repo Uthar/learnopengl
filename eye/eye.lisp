@@ -10,10 +10,12 @@ in vec2 texcoords;
 out vec4 fragPos;
 out vec2 texPos;
 
-uniform mat4 thing;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main() {
-  fragPos = thing * vec4(pos, 1.0);
+  fragPos = projection * view * model * vec4(pos, 1.0);
   texPos = texcoords;
   gl_Position = fragPos;
 }
@@ -63,36 +65,38 @@ void main() {
 
   (gl:use-program program)
 
-  (->>
-    (m*
-     (mtranslation (vec -0.0
-                        (- (* 0.25 (sin (al:get-time))) 0.4)
-                        0.0))
-     (mrotation +vx+ (degree->radian (coerce (* 30 (sin (al:get-time))) 'single-float)))
-     (mrotation +vy+ (degree->radian (* 25 (coerce (al:get-time) 'single-float))))
-     (mrotation +vz+ (degree->radian -15.0))
-     (mscaling (vec 1.0 0.8 1.0)))
-    marr
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "thing")))
-
   (gl:bind-texture :texture-2d pyramid-texture)
 
   (gl:bind-vertex-array vao)
 
+  (let ((model (m*
+                (mtranslation (vec (* 1.25 (cos (al:get-time)))
+                                   (* 0.25 (sin (al:get-time)))
+                                   (+ -0.9 (* 2.25 (sin (al:get-time))))))
+                (mrotation +vy+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
+                (mscaling (vec3 1.0 0.8 1.0))
+                ))
+        (view (mtranslation (vec 0.0 0.0 -3.0)))
+        (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
+
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "model") (marr model))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "view") (marr view))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "projection") (marr projection)))
+
   (gl:draw-elements :triangles
                     (gl:make-null-gl-array :unsigned-int)
                     :count (slot-value indices 'gl::size))
-  (->>
-    (m*
-     (mtranslation (vec 0.0
-                        (+ 0.6 (- (* 0.25 (sin (al:get-time))) 0.3))
-                        0.5))
-     (mrotation +vx+ (degree->radian (coerce (* 30 (sin (al:get-time))) 'single-float)))
-     (mrotation +vy+ (- (degree->radian (* 25 (coerce (al:get-time) 'single-float)))))
-     (mrotation +vz+ (degree->radian -15.0))
-     (mscaling (vec 0.6 0.6 0.6)))
-    marr
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "thing")))
+
+  (let ((model (m* (mtranslation (vec3 0.0 (* 0.6 (sin (al:get-time))) 0.0))
+                   (mrotation +vy+ (degree->radian (coerce (* 100 (al:get-time)) 'single-float)))
+                   (mscaling (vec3 1.0 0.8 1.0))))
+
+        (view (mtranslation (vec 0.0 -0.2 -4.0)))
+        (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
+
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "model") (marr model))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "view") (marr view))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location program "projection") (marr projection)))
 
   (gl:draw-elements :triangles
                     (gl:make-null-gl-array :unsigned-int)
