@@ -131,17 +131,43 @@ void main() {
 
 (defparameter camera-speed 0.25)
 
+(defparameter mouse-enabled t)
+
+(defparameter first-mouse nil)
+
 (defmethod handle-event ((event-type (eql :key-char)) event)
   (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
     (case keycode
       (:up    (nv+ camera-position (v* (v- camera-direction) camera-speed)))
       (:down  (nv- camera-position (v* (v- camera-direction) camera-speed)))
-      (:left  (nv+ camera-position (v* (v- camera-right) camera-speed)))
-      (:right (nv- camera-position (v* (v- camera-right) camera-speed))))))
+      (:left  (nv- camera-position (v* (vunit (vc (vec3 0 1 0) camera-position)) camera-speed)))
+      (:right (nv+ camera-position (v* (vunit (vc (vec3 0 1 0) camera-position)) camera-speed)))
+      (:escape (progn
+                 (al:set-mouse-xy display 400 300)
+                 (setf first-mouse t
+                       mouse-enabled (not mouse-enabled)
+                       )
+                 )))))
+
+(defparameter yaw 0.0)
+(defparameter pitch 0.0)
 
 (defmethod handle-event ((event-type (eql :mouse-axis)) event)
-  ;; (format t "Mouse moved: ~a~%" event)
-  )
+  (when mouse-enabled
+    (let* ((x (if first-mouse 0 (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dx)))
+           (y (if first-mouse 0 (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dy)))
+           (sensitivity 0.3)
+           (offset-x (* sensitivity x))
+           (offset-y (* sensitivity y))
+           )
+      (incf yaw offset-x)
+      (setf pitch (alexandria:clamp (- pitch offset-y) -89.0 89.0))
+      (setf camera-direction (v- (vunit (vec3 (* (cos (degree->radian yaw)) (cos (degree->radian pitch)))
+                                              (sin (degree->radian pitch))
+                                              (* (sin (degree->radian yaw)) (cos (degree->radian pitch)))))))
+      (al:set-mouse-xy display 400 300)
+      (setf first-mouse nil))))
+
 
 (defmethod handle-event ((event-type t) event)
   ;; (format t "Unknown event ~a: ~a~%" event-type event))
