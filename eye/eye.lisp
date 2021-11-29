@@ -69,38 +69,42 @@ void main() {
 
   (gl:bind-vertex-array vao)
 
-  (let ((model (m*
-                (mtranslation (vec (* 1.25 (cos (al:get-time)))
-                                   (* 0.25 (sin (al:get-time)))
-                                   (+ -0.9 (* 2.25 (sin (al:get-time))))))
-                (mrotation +vy+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
-                (mscaling (vec3 1.0 0.8 1.0))
-                ))
-        (view (mtranslation (vec 0.0 0.0 -3.0)))
+  (let ((view (mtranslation (vec 0.0 0.0 -3.0)))
         (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
 
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "model") (marr model))
     (gl:uniform-matrix-4fv (gl:get-uniform-location program "view") (marr view))
     (gl:uniform-matrix-4fv (gl:get-uniform-location program "projection") (marr projection)))
 
-  (gl:draw-elements :triangles
-                    (gl:make-null-gl-array :unsigned-int)
-                    :count (slot-value indices 'gl::size))
+  ;;;;
 
-  (let ((model (m* (mtranslation (vec3 0.0 (* 0.6 (sin (al:get-time))) 0.0))
-                   (mrotation +vy+ (degree->radian (coerce (* 100 (al:get-time)) 'single-float)))
-                   (mscaling (vec3 1.0 0.8 1.0))))
+  (flet ((draw-pyramid (translation)
 
-        (view (mtranslation (vec 0.0 -0.2 -4.0)))
-        (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
+           (let ((model (m* (mtranslation translation)
+                            ;; (mrotation +vx+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
+                            (mrotation +vy+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
+                            ;; (mrotation +vz+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
+                            (mscaling (vec3 1.0 0.8 1.0)))))
 
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "model") (marr model))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "view") (marr view))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location program "projection") (marr projection)))
+             (gl:uniform-matrix-4fv (gl:get-uniform-location program "model") (marr model)))
 
-  (gl:draw-elements :triangles
-                    (gl:make-null-gl-array :unsigned-int)
-                    :count (slot-value indices 'gl::size))
+           (gl:draw-elements :triangles
+                             (gl:make-null-gl-array :unsigned-int)
+                             :count (slot-value indices 'gl::size))))
+
+    (draw-pyramid (vec3 0.0 0.0 0.0))
+    (draw-pyramid (vec3 2.0 0.5 -3.0))
+    (draw-pyramid (vec3 -2.0 1.2 -2.0))
+    (draw-pyramid (vec3 -2.2 -1.2 -6.0))
+    (draw-pyramid (vec3 -4.7 -2.7 -10.0))
+    (draw-pyramid (vec3 4.7 2.7 -10.0))
+    (draw-pyramid (vec3 2.0 2.7 -7.0))
+    (draw-pyramid (vec3 2.0 -2.0 -4.0))
+    (draw-pyramid (vec3 0.5 -1.0 -2.0))
+    (draw-pyramid (vec3 -1.9 -0.2 -2.5))
+    (draw-pyramid (vec3 -1.5 -2.1 -4.0))
+    )
+
+  ;;;;
 
   (al:flip-display)
 
