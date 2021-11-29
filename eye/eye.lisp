@@ -59,6 +59,20 @@ void main() {
 
 (defparameter pyramid-texture nil)
 
+(defparameter camera-position (vec3 0 0 3))
+
+;; Actually pointing in the reverse direction of where it's targeting
+;; (to align with OpenGL being a right-handed coordinate system)
+(defparameter camera-direction (vunit (v- camera-position (vec3 0 0 0))))
+
+;; Perpendicular to the world Y axis and the camera Z axis
+(defparameter camera-right (vunit (vc (vec3 0 1 0) camera-position)))
+
+;; Perpendicular to both the camera Z and X axes
+(defparameter camera-up (vc camera-direction camera-right))
+
+;; We get a 3d coordinate system starting at camera-position
+
 (defun render ()
   (gl:clear-color 0.2 0.4 0.6 1.0)
   (gl:clear :color-buffer-bit :depth-buffer-bit)
@@ -69,7 +83,7 @@ void main() {
 
   (gl:bind-vertex-array vao)
 
-  (let ((view (mtranslation (vec 0.0 0.0 -3.0)))
+  (let ((view (mlookat camera-position (v+ camera-position (v- camera-direction)) camera-up))
         (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
 
     (gl:uniform-matrix-4fv (gl:get-uniform-location program "view") (marr view))
@@ -81,7 +95,7 @@ void main() {
 
            (let ((model (m* (mtranslation translation)
                             ;; (mrotation +vx+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
-                            (mrotation +vy+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
+                            (mrotation +vy+ (degree->radian (coerce (* 0 (al:get-time)) 'single-float)))
                             ;; (mrotation +vz+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
                             (mscaling (vec3 1.0 0.8 1.0)))))
 
@@ -95,13 +109,14 @@ void main() {
     (draw-pyramid (vec3 2.0 0.5 -3.0))
     (draw-pyramid (vec3 -2.0 1.2 -2.0))
     (draw-pyramid (vec3 -2.2 -1.2 -6.0))
-    (draw-pyramid (vec3 -4.7 -2.7 -10.0))
-    (draw-pyramid (vec3 4.7 2.7 -10.0))
+    (draw-pyramid (vec3 -2.7 -2.7 -2.0))
+    (draw-pyramid (vec3 1.6 3.3 -3.7))
     (draw-pyramid (vec3 2.0 2.7 -7.0))
     (draw-pyramid (vec3 2.0 -2.0 -4.0))
     (draw-pyramid (vec3 0.5 -1.0 -2.0))
     (draw-pyramid (vec3 -1.9 -0.2 -2.5))
     (draw-pyramid (vec3 -1.5 -2.1 -4.0))
+    (draw-pyramid (vec3 -1.2 2.1 -5.0))
     )
 
   ;;;;
@@ -110,12 +125,46 @@ void main() {
 
   (sleep 1/60))
 
+(defparameter event-queue nil)
+
+(defgeneric handle-event (event-type event))
+
+(defparameter camera-speed 0.25)
+
+(defmethod handle-event ((event-type (eql :key-char)) event)
+  (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
+    (case keycode
+      (:up    (nv+ camera-position (v* (v- camera-direction) camera-speed)))
+      (:down  (nv- camera-position (v* (v- camera-direction) camera-speed)))
+      (:left  (nv+ camera-position (v* (v- camera-right) camera-speed)))
+      (:right (nv- camera-position (v* (v- camera-right) camera-speed))))))
+
+(defmethod handle-event ((event-type (eql :mouse-axis)) event)
+  ;; (format t "Mouse moved: ~a~%" event)
+  )
+
+(defmethod handle-event ((event-type t) event)
+  ;; (format t "Unknown event ~a: ~a~%" event-type event))
+  )
+
+(defun handle-input ()
+  (cffi:with-foreign-object (event '(:union al:event))
+    (loop while (al:get-next-event event-queue event)
+          do (handle-event
+              (cffi:foreign-slot-value event '(:struct al:any-event) 'type)
+              event))))
+
 (defun run-example ()
 
   (unwind-protect
        (progn
          (setf display (init-display))
          (al:set-target-backbuffer display)
+         (setf event-queue (al:create-event-queue))
+         (al:install-keyboard)
+         (al:install-mouse)
+         (al:register-event-source event-queue (al:get-mouse-event-source))
+         (al:register-event-source event-queue (al:get-keyboard-event-source))
          (gl:enable :depth-test)
 
          (setf vertices
@@ -189,6 +238,7 @@ void main() {
          ;; Draw the stuff
          (loop while running do
            (with-simple-restart (next-iteration "Continue")
+             (funcall 'handle-input)
              (funcall 'render))))
 
     (gl:delete-vertex-arrays (list vao))
