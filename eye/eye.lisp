@@ -95,7 +95,7 @@ void main() {
 
            (let ((model (m* (mtranslation translation)
                             ;; (mrotation +vx+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
-                            (mrotation +vy+ (degree->radian (coerce (* 0 (al:get-time)) 'single-float)))
+                            (mrotation +vy+ (degree->radian (coerce (* 40 (al:get-time)) 'single-float)))
                             ;; (mrotation +vz+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
                             (mscaling (vec3 1.0 0.8 1.0)))))
 
