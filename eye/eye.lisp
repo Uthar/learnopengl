@@ -194,11 +194,11 @@ void main() {
          (gl:enable :depth-test)
 
          (setf vertices
-               (gl-array :float (vector 0.0  1.0  0.0    0.5 1.0
-                                        0.5  0.0 -0.5    0.0 0.0
+               (gl-array :float (vector  0.0  1.0  0.0    0.5 1.0
+                                         0.5  0.0 -0.5    0.0 0.0
                                         -0.5  0.0 -0.5    1.0 0.0
                                         -0.5  0.0  0.5    0.1 0.0
-                                        0.5  0.0  0.5    0.0 1.0
+                                         0.5  0.0  0.5    0.0 1.0
                                         )))
 
 
