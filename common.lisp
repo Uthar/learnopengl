@@ -1,5 +1,5 @@
 (defpackage :learnopengl
-  (:use :cl :3d-matrices :3d-vectors))
+  (:use :cl :alexandria :3d-matrices :3d-vectors))
 
 (in-package :learnopengl)
 
@@ -63,4 +63,3 @@
                 (append form (list expansion))
                 (append (list form) (list expansion))))
           forms))
-
