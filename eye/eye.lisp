@@ -51,11 +51,7 @@ void main() {
 
 (defparameter running t)
 
-(defparameter pyramid-raw
-  (with-open-file (stream "pyramid.data" :element-type '(unsigned-byte 8))
-    (let ((content (make-array (file-length stream) :element-type (stream-element-type stream))))
-      (read-sequence content stream)
-      content)))
+(defparameter pyramid-raw (read-file-into-byte-vector "../pyramid.data"))
 
 (defparameter pyramid-texture nil)
 
