@@ -87,9 +87,9 @@ void main() {
 
   ;;;;
 
-  (flet ((draw-pyramid (translation)
+  (flet ((draw-pyramid (position)
 
-           (let ((model (m* (mtranslation translation)
+           (let ((model (m* (mtranslation position)
                             ;; (mrotation +vx+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
                             (mrotation +vy+ (degree->radian (coerce (* 40 (al:get-time)) 'single-float)))
                             ;; (mrotation +vz+ (degree->radian (coerce (* 30 (al:get-time)) 'single-float)))
