@@ -166,8 +166,11 @@ void main() {
 
 
 (defmethod handle-event ((event-type t) event)
-  ;; (format t "Unknown event ~a: ~a~%" event-type event))
-  )
+  (format t "Unknown event ~a: ~a~%" event-type event))
+
+(defmethod handle-event ((event-type (eql :display-close)) event)
+  (format t "Display close event ~a: ~a~%" event-type event)
+  (sb-ext:quit))
 
 (defun handle-input ()
   (cffi:with-foreign-object (event '(:union al:event))
@@ -187,6 +190,7 @@ void main() {
          (al:install-mouse)
          (al:register-event-source event-queue (al:get-mouse-event-source))
          (al:register-event-source event-queue (al:get-keyboard-event-source))
+         (al:register-event-source event-queue (al:get-display-event-source display))
          (gl:enable :depth-test)
 
          (setf vertices
