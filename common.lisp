@@ -9,7 +9,6 @@
 
 (defun init-display (&key (x 800) (y 600))
   (al:init)
-  (al:init-primitives-addon)
   (al:set-new-display-flags '(:windowed :resizable :opengl))
   (al:set-new-display-option :vsync 0 :require)
 
