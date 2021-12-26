@@ -51,7 +51,7 @@ void main() {
 
 (defparameter running t)
 
-(defparameter pyramid-raw (read-file-into-byte-vector "../pyramid.data"))
+(defparameter pyramid-raw (read-file-into-byte-vector "pyramid.data"))
 
 (defparameter pyramid-texture nil)
 
