@@ -1,2 +1,6 @@
 *.fasl
 .direnv/
+*.dll
+*.exe
+*.zip
+*.so*
