@@ -170,7 +170,7 @@ void main() {
 
 (defmethod handle-event ((event-type (eql :display-close)) event)
   (format t "Display close event ~a: ~a~%" event-type event)
-  (sb-ext:quit))
+  (throw 'game nil))
 
 (defun handle-input ()
   (cffi:with-foreign-object (event '(:union al:event))
@@ -182,7 +182,7 @@ void main() {
 (defun run-example ()
 
   (unwind-protect
-       (progn
+       (catch 'game
          (setf display (init-display))
          (al:set-target-backbuffer display)
          (setf event-queue (al:create-event-queue))
