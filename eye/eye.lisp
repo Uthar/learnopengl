@@ -36,36 +36,36 @@ void main() {
 }
 ")
 
-(defparameter vs nil)
-(defparameter fs nil)
-(defparameter program nil)
+(defvar vs nil)
+(defvar fs nil)
+(defvar program nil)
 
-(defparameter vertices nil)
-(defparameter indices nil)
+(defvar vertices nil)
+(defvar indices nil)
 
-(defparameter vao nil)
-(defparameter vbo nil)
-(defparameter ebo nil)
+(defvar vao nil)
+(defvar vbo nil)
+(defvar ebo nil)
 
-(defparameter display nil)
+(defvar display nil)
 
-(defparameter running t)
+(defvar running t)
 
-(defparameter pyramid-raw (read-file-into-byte-vector "pyramid.data"))
+(defvar pyramid-raw (read-file-into-byte-vector "pyramid.data"))
 
-(defparameter pyramid-texture nil)
+(defvar pyramid-texture nil)
 
-(defparameter camera-position (vec3 0 0 3))
+(defvar camera-position (vec3 0 0 3))
 
 ;; Actually pointing in the reverse direction of where it's targeting
 ;; (to align with OpenGL being a right-handed coordinate system)
-(defparameter camera-direction (vunit (v- camera-position (vec3 0 0 0))))
+(defvar camera-direction (vunit (v- camera-position (vec3 0 0 0))))
 
 ;; Perpendicular to the world Y axis and the camera Z axis
-(defparameter camera-right (vunit (vc (vec3 0 1 0) camera-position)))
+(defvar camera-right (vunit (vc (vec3 0 1 0) camera-position)))
 
 ;; Perpendicular to both the camera Z and X axes
-(defparameter camera-up (vc camera-direction camera-right))
+(defvar camera-up (vc camera-direction camera-right))
 
 ;; We get a 3d coordinate system starting at camera-position
 
@@ -121,7 +121,7 @@ void main() {
 
   (sleep 1/60))
 
-(defparameter event-queue nil)
+(defvar event-queue nil)
 
 (defgeneric handle-event (event-type event))
 
@@ -166,7 +166,8 @@ void main() {
 
 
 (defmethod handle-event ((event-type t) event)
-  (format t "Unknown event ~a: ~a~%" event-type event))
+  ;; (format t "Unknown event ~a: ~a~%" event-type event)
+  )
 
 (defmethod handle-event ((event-type (eql :display-close)) event)
   (format t "Display close event ~a: ~a~%" event-type event)
