@@ -8,4 +8,6 @@
                :3d-matrices
                :3d-vectors
                )
-  :components ((:file "common")))
+  :components ((:file "common")
+               (:file "shader")
+               (:file "3d")))

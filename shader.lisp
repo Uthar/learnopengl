@@ -1,3 +1,4 @@
+(in-package :learnopengl)
 
 (defun link-shader-program (vs fs)
   (let ((id (gl:create-program)))
