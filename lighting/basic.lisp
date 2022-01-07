@@ -45,11 +45,7 @@
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos") (varr3 camera-position))
 
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.ambient") (vector 0.8 0.6 0.2))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.diffuse") (vector
-                                                                              (* (1+ (sin (al:get-time))) 0.5)
-                                                                              (* (1+ (cos (al:get-time))) 0.5)
-                                                                              0.5
-                                                                              ))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.diffuse") (vector 0.8 0.6 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.specular") (vector 0.5 0.5 0.5))
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
