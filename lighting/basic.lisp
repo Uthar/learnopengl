@@ -43,6 +43,8 @@
                            (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "lightPos")
                 (vector (vx light-pos) (vy light-pos) (vz light-pos)))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos")
+                (vector (vx camera-position) (vy camera-position) (vz camera-position)))
 
   (gl:bind-vertex-array big-cube)
   (gl:draw-arrays :triangles 0 36)
@@ -59,7 +61,9 @@
   (ignore-errors (gl:delete-program light-cube-shader))
   (ignore-errors (gl:delete-program big-cube-shader))
   (ignore-errors (gl:delete-vertex-arrays (list light-cube)))
+  (ignore-errors (gl:delete-buffers (list (1- light-cube))))
   (ignore-errors (gl:delete-vertex-arrays (list big-cube)))
+  (ignore-errors (gl:delete-buffers (list (1- big-cube))))
   (defparameter light-cube-shader (shader "./vs.vert" "./light-cube.frag"))
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
   (let ((view (mlookat camera-position (v+ camera-position (v- camera-direction)) camera-up))
