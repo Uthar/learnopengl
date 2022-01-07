@@ -7,6 +7,8 @@ mkShell {
       cl-liballegro
       _3d-matrices
       _3d-vectors
+      png-read
+      cl-jpeg
     ]))
   ];
 }
