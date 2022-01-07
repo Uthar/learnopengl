@@ -87,6 +87,7 @@
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
   (defparameter container-diffuse-map (texture "container2.png"))
   (defparameter container-specular-map (texture "container2_specular.png"))
+  (defparameter container-emission-map (texture "matrix.jpg"))
   (defparameter big-cube (cube))
   (defparameter light-cube (cube))
 
