@@ -9,10 +9,10 @@ out vec3 pos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 normal;
+uniform mat3 normal;
 
 void main() {
   gl_Position = projection * view * model * vec4(vertexData, 1.0);
-  norm = vec3(normal * vec4(vertexNormal, 0.0));
+  norm = normal * vertexNormal;
   pos = vec3(model * vec4(vertexData, 1.0));
 }

@@ -39,8 +39,8 @@
                 )))
     (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "model")
                            (marr model))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "normal")
-                           (marr (mtranspose (minv model)))))
+    (gl:uniform-matrix-3fv (gl:get-uniform-location big-cube-shader "normal")
+                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "lightPos")
                 (vector (vx light-pos) (vy light-pos) (vz light-pos)))
 
