@@ -50,15 +50,20 @@
   (gl:bind-texture :texture-2d container-diffuse-map)
   (gl:active-texture :texture1)
   (gl:bind-texture :texture-2d container-specular-map)
+  (gl:active-texture :texture2)
+  (gl:bind-texture :texture-2d container-emission-map)
 
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.diffuse") 0)
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.specular") 1)
+  (gl:uniformi (gl:get-uniform-location big-cube-shader "material.emission") 2)
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 light-pos))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
 
   (gl:bind-vertex-array big-cube)
   (gl:draw-arrays :triangles 0 36)
@@ -109,5 +114,7 @@
       (render))))
 
 (defvar mainloop-thread (bt:make-thread #'mainloop))
-;; (setf mainloop-thread (bt:make-thread #'mainloop))
-;; (bt:destroy-thread mainloop-thread)
+
+(defun reset ()
+  (ignore-errors (bt:destroy-thread mainloop-thread))
+  (setf mainloop-thread (bt:make-thread #'mainloop)))
