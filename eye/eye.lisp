@@ -157,7 +157,7 @@ void main() {
            (offset-y (* sensitivity y))
            )
       (incf yaw offset-x)
-      (setf pitch (alexandria:clamp (- pitch offset-y) -89.0 89.0))
+      (setf pitch (clamp (- pitch offset-y) -89.0 89.0))
       (setf camera-direction (v- (vunit (vec3 (* (cos (degree->radian yaw)) (cos (degree->radian pitch)))
                                               (sin (degree->radian pitch))
                                               (* (sin (degree->radian yaw)) (cos (degree->radian pitch)))))))

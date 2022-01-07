@@ -2,7 +2,7 @@
 
 (defun link-shader-program (vs fs)
   (let ((id (gl:create-program)))
-    (assert (plusp id) nil "Cannot create GL shader program")
+    (assert (plusp id) (id) "Cannot create GL shader program")
     (gl:attach-shader id vs)
     (gl:attach-shader id fs)
     (gl:link-program id)
@@ -16,7 +16,7 @@
 (defun compile-shader (type path)
   (let ((src (uiop:read-file-string path))
         (id (gl:create-shader type)))
-    (assert (plusp id) nil "Cannot create GL shader")
+    (assert (plusp id) (id) "Cannot create GL shader")
     (gl:shader-source id src)
     (gl:compile-shader id)
     (let ((log (gl:get-shader-info-log id)))

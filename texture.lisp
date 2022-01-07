@@ -12,7 +12,7 @@
       texture)))
 
 (defun read-image (path)
-  (alexandria:switch ((pathname-type path) :test #'string=)
+  (switch ((pathname-type path) :test #'string=)
     ("jpg" (read-image-jpeg path))
     ("png" (read-image-png path))
     (t (error "Format ~a not supported" (pathname-type path)))))
