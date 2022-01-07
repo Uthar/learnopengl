@@ -88,3 +88,8 @@
   (al:destroy-display display)
   (setf event-queue (cffi:null-pointer))
   (setf display (cffi:null-pointer)))
+
+
+(defun varr3 (v)
+  (declare (optimize speed))
+  (vector (vx3 v) (vy3 v) (vz3 v)))

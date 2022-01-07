@@ -10,14 +10,14 @@
   (gl:clear :color-buffer-bit :depth-buffer-bit)
 
   (gl:use-program light-cube-shader)
-  (setf light-pos (vec3
-                   (* 1.2 (sin (* 1.0 (al:get-time))))
-                   ;; 0.75
-                   (* (sin (* 1.0 (al:get-time))))
-                   ;; 0.6
-                   (cos (* 1.0 (al:get-time)))
-                   ;; 1.0
-                   ))
+  ;; (setf light-pos (vec3
+  ;;                  (* 1.2 (sin (* 1.0 (al:get-time))))
+  ;;                  ;; 0.75
+  ;;                  (* (sin (* 1.0 (al:get-time))))
+  ;;                  ;; 0.6
+  ;;                  (cos (* 1.0 (al:get-time)))
+  ;;                  ;; 1.0
+  ;;                  ))
   (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "model")
                          (marr (m*
                                 ;; (mrotation +vx+ (degree->radian 15.0))
@@ -41,10 +41,22 @@
                            (marr model))
     (gl:uniform-matrix-3fv (gl:get-uniform-location big-cube-shader "normal")
                            (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "lightPos")
-                (vector (vx light-pos) (vy light-pos) (vz light-pos)))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos")
-                (vector (vx camera-position) (vy camera-position) (vz camera-position)))
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos") (varr3 camera-position))
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.ambient") (vector 0.8 0.6 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.diffuse") (vector
+                                                                              (* (1+ (sin (al:get-time))) 0.5)
+                                                                              (* (1+ (cos (al:get-time))) 0.5)
+                                                                              0.5
+                                                                              ))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "material.specular") (vector 0.5 0.5 0.5))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 light-pos))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.diffuse") (vector 1.0 1.0 1.0))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.specular") (vector 0.5 0.5 0.5))
 
   (gl:bind-vertex-array big-cube)
   (gl:draw-arrays :triangles 0 36)
@@ -61,9 +73,9 @@
   (ignore-errors (gl:delete-program light-cube-shader))
   (ignore-errors (gl:delete-program big-cube-shader))
   (ignore-errors (gl:delete-vertex-arrays (list light-cube)))
-  (ignore-errors (gl:delete-buffers (list (1- light-cube))))
+  (ignore-errors (gl:delete-buffers (list light-cube)))
   (ignore-errors (gl:delete-vertex-arrays (list big-cube)))
-  (ignore-errors (gl:delete-buffers (list (1- big-cube))))
+  (ignore-errors (gl:delete-buffers (list big-cube)))
   (defparameter light-cube-shader (shader "./vs.vert" "./light-cube.frag"))
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
   (let ((view (mlookat camera-position (v+ camera-position (v- camera-direction)) camera-up))
