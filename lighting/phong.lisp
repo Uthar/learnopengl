@@ -225,6 +225,7 @@
                  (al:set-mouse-xy display (/ width 2) (/ height 2))
                  (setf mouse-enabled (not mouse-enabled)))))))
 
+;; FIXME make walking speed framerate independent
 (defun simulate-game ()
   (when (member :front *walking*) (walk* camera :z (- walk-speed)))
   (when (member :back  *walking*) (walk* camera :z (+ walk-speed)))
