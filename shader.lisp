@@ -14,7 +14,7 @@
     id))
 
 (defun compile-shader (type path)
-  (let ((src (uiop:read-file-string path))
+  (let ((src (read-file-into-string path))
         (id (gl:create-shader type)))
     (assert (plusp id) (id) "Cannot create GL shader")
     (gl:shader-source id src)

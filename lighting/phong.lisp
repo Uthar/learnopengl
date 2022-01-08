@@ -42,7 +42,7 @@
                                 (mtranslation light-pos)
                                 (mscaling (vec3 0.2 0.2 0.2)))))
   (gl:bind-vertex-array light-cube)
-  (gl:draw-arrays :triangles 0 36)
+  ;; (gl:draw-arrays :triangles 0 36)
   (gl:bind-vertex-array 0)
   (gl:use-program 0)
 
@@ -62,7 +62,7 @@
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.emission") 2)
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 light-pos))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.direction") (vector -0.3 -1.0 -0.6))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.specular") (vector 0.5 0.5 0.5))
