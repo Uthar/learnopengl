@@ -202,8 +202,8 @@
       (:down  (walk* camera :z camera-speed))
       (:left  (walk* camera :x camera-speed))
       (:right (walk* camera :x (- camera-speed)))
-      (:space (walk* camera :y camera-speed))
-      (:d     (walk* camera :y (- camera-speed)))
+      ;; (:space (walk* camera :y camera-speed))
+      ;; (:d     (walk* camera :y (- camera-speed)))
       (:f     (setf flashlight-active-p (not flashlight-active-p)))
       (:escape (progn
                  (al:set-mouse-xy display (/ width 2) (/ height 2))
@@ -227,6 +227,7 @@
   (error "Display closed"))
 
 (defmethod handle-event ((event-type t) event)
+  (format t "Unknown event type ~a: ~a~%" event-type event)
   )
 
 (defun mainloop ()
