@@ -111,8 +111,8 @@
 
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].position") (varr3 (slot-value camera 'position)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].direction") (varr3 (slot-value camera 'direction)))
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].cutoff") (cos (degree->radian 12.5)))
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].outer") (cos (degree->radian 13.5)))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].cutoff") (cos (degree->radian 8.5)))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].outer") (cos (degree->radian 9.5)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
