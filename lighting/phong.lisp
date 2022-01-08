@@ -170,13 +170,11 @@
 
   (let ((view (view-matrix camera))
         (projection (mperspective (slot-value camera 'zoom) (/ width height) 0.1 100.0)))
-    (gl:use-program big-cube-shader)
-    (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "view") (marr view))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "projection") (marr projection))
-    (gl:use-program light-cube-shader)
-    (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "view") (marr view))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "projection") (marr projection))
-    (gl:use-program 0)))
+    (dolist (s shaders)
+      (gl:use-program s)
+      (gl:uniform-matrix-4fv (gl:get-uniform-location s "view") (marr view))
+      (gl:uniform-matrix-4fv (gl:get-uniform-location s "projection") (marr projection))
+      (gl:use-program 0))))
 
 (defun process-input ()
   (cffi:with-foreign-object (event '(:union al:event))
