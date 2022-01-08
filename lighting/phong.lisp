@@ -1,6 +1,9 @@
 (in-package :learnopengl)
 
 (defparameter light-pos (vec3 1.6 -0.0 -4.7))
+(defparameter light-color (vector 0.0 7.0 0.0))
+(defparameter light-2-pos (vec3 1.6 -0.0 -4.7))
+(defparameter light-2-color (vector 7.0 0.0 0.0))
 (defparameter camera-position (vec3 0 0 3))
 (defparameter camera-direction (vec3 0 0 2))
 (defparameter camera-up +vy+)
@@ -26,14 +29,16 @@
   (gl:clear :color-buffer-bit :depth-buffer-bit)
 
   (gl:use-program light-cube-shader)
-  ;; (setf light-pos (vec3
-  ;;                  (* 1.2 (sin (* 1.0 (al:get-time))))
-  ;;                  ;; 0.75
-  ;;                  (* (sin (* 1.0 (al:get-time))))
-  ;;                  ;; 0.6
-  ;;                  (cos (* 1.0 (al:get-time)))
-  ;;                  ;; 1.0
-  ;;                  ))
+  (gl:bind-vertex-array light-cube)
+
+  (setf light-pos (vec3
+                   (* 1.2 (sin (* 1.0 (al:get-time))))
+                   ;; 0.75
+                   (* 3.6 (sin (* 1.0 (al:get-time))))
+                   ;; 0.6
+                   (- (* 3.2 (cos (* 1.0 (al:get-time)))) 6)
+                   ;; 1.0
+                   ))
   (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "model")
                          (marr (m*
                                 ;; (mrotation +vx+ (degree->radian 15.0))
@@ -41,8 +46,27 @@
                                 ;; (mtranslation (vec3 1.0 1.0 0.0))
                                 (mtranslation light-pos)
                                 (mscaling (vec3 0.2 0.2 0.2)))))
-  (gl:bind-vertex-array light-cube)
+  (gl:uniformfv (gl:get-uniform-location light-cube-shader "color") light-color)
   (gl:draw-arrays :triangles 0 36)
+
+  (setf light-2-pos (vec3
+                   (* -1.2 (sin (* 1.0 (al:get-time))))
+                   ;; 0.75
+                   (* -3.6 (sin (* 1.0 (al:get-time))))
+                   ;; 0.6
+                   (- (* 3.2 (cos (* 1.0 (al:get-time)))) 6)
+                   ;; 1.0
+                   ))
+  (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "model")
+                         (marr (m*
+                                ;; (mrotation +vx+ (degree->radian 15.0))
+                                ;; (mrotation +vy+ (degree->radian -10.0))
+                                ;; (mtranslation (vec3 1.0 1.0 0.0))
+                                (mtranslation light-2-pos)
+                                (mscaling (vec3 0.2 0.2 0.2)))))
+  (gl:uniformfv (gl:get-uniform-location light-cube-shader "color") light-2-color)
+  (gl:draw-arrays :triangles 0 36)
+
   (gl:bind-vertex-array 0)
   (gl:use-program 0)
 
@@ -62,16 +86,41 @@
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.emission") 2)
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 camera-position))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.direction") (varr3 camera-direction))
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.cutoff") (cos (degree->radian 12.5)))
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.outer") (cos (degree->radian 18.5)))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.ambient") (vector 0.2 0.2 0.2))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.diffuse") (vector 1.0 1.0 1.0))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.specular") (vector 0.5 0.5 0.5))
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.constant")  1.0);
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.linear")    0.09);
-  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.quadratic") 0.032);
+  ;; (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 camera-position))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.direction") (vector -0.3 -1.0 -1.0))
+  ;; (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.cutoff") (cos (degree->radian 12.5)))
+  ;; (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.outer") (cos (degree->radian 18.5)))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.diffuse") (vector 1.0 1.0 1.0))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[0].position") (varr3 light-pos))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[0].constant")  1.0)
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[0].linear")    0.220)
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[0].quadratic") 0.20)
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[0].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[0].diffuse") light-color)
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[0].specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[1].position") (varr3 light-2-pos))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[1].constant")  1.0)
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[1].linear")    0.220)
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "pointLights[1].quadratic") 0.20)
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[1].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[1].diffuse") light-2-color)
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "pointLights[1].specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformi  (gl:get-uniform-location big-cube-shader "numPointLights") 2)
+
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].position") (varr3 camera-position))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].direction") (varr3 camera-direction))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].cutoff") (cos (degree->radian 12.5)))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].outer") (cos (degree->radian 13.5)))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
+  (gl:uniformi  (gl:get-uniform-location big-cube-shader "numSpotLights") 1)
+
 
   (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
 
