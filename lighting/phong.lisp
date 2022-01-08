@@ -4,9 +4,6 @@
 (defparameter light-color (vector 0.0 7.0 0.0))
 (defparameter light-2-pos (vec3 1.6 -0.0 -4.7))
 (defparameter light-2-color (vector 7.0 0.0 0.0))
-(defparameter camera-position (vec3 0 0 3))
-(defparameter camera-direction (vec3 0 0 2))
-(defparameter camera-up +vy+)
 
 (defun draw-box (x y z)
   "Draw a big box at (x, y, z) world coordinates"
@@ -72,7 +69,7 @@
 
   (gl:use-program big-cube-shader)
 
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos") (varr3 camera-position))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos") (varr3 (slot-value camera 'position)))
 
   (gl:active-texture :texture0)
   (gl:bind-texture :texture-2d container-diffuse-map)
@@ -112,14 +109,17 @@
 
   (gl:uniformi  (gl:get-uniform-location big-cube-shader "numPointLights") 2)
 
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].position") (varr3 camera-position))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].direction") (varr3 camera-direction))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].position") (varr3 (slot-value camera 'position)))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].direction") (varr3 (slot-value camera 'direction)))
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].cutoff") (cos (degree->radian 12.5)))
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].outer") (cos (degree->radian 13.5)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
-  (gl:uniformi  (gl:get-uniform-location big-cube-shader "numSpotLights") 1)
+
+  (if flashlight-active-p
+      (gl:uniformi  (gl:get-uniform-location big-cube-shader "numSpotLights") 1)
+      (gl:uniformi  (gl:get-uniform-location big-cube-shader "numSpotLights") 0))
 
 
   (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
@@ -138,9 +138,12 @@
   (al:flip-display)
   (sleep 1/60))
 
+(defparameter width 800)
+(defparameter height 600)
+
 (defun init ()
   (al:set-target-backbuffer display)
-  (gl:viewport 0 0 800 600)
+  (gl:viewport 0 0 width height)
   (gl:enable :depth-test)
 
   (ignore-errors
@@ -156,14 +159,17 @@
 
   (defparameter light-cube-shader (shader "./vs.vert" "./light-cube.frag"))
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
+  (defparameter shaders (list light-cube-shader big-cube-shader))
   (defparameter container-diffuse-map (texture "container2.png"))
   (defparameter container-specular-map (texture "container2_specular.png"))
   (defparameter container-emission-map (texture "matrix.jpg"))
   (defparameter big-cube (cube))
   (defparameter light-cube (cube))
+  (defparameter camera (camera 0 0 3))
+  (defparameter mouse-enabled nil)
 
-  (let ((view (mlookat camera-position (v+ camera-position (v- camera-direction)) camera-up))
-        (projection (mperspective 45 (/ 800.0 600.0) 0.1 100.0)))
+  (let ((view (view-matrix camera))
+        (projection (mperspective (slot-value camera 'zoom) (/ width height) 0.1 100.0)))
     (gl:use-program big-cube-shader)
     (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "view") (marr view))
     (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "projection") (marr projection))
@@ -172,11 +178,62 @@
     (gl:uniform-matrix-4fv (gl:get-uniform-location light-cube-shader "projection") (marr projection))
     (gl:use-program 0)))
 
+(defun process-input ()
+  (cffi:with-foreign-object (event '(:union al:event))
+    (loop while (al:get-next-event event-queue event)
+          do (handle-event
+              (cffi:foreign-slot-value event '(:struct al:any-event) 'type)
+              event))))
+
+(defparameter camera-speed 0.25)
+
+(defun walk* (camera &key (x 0.0) (y 0.0) (z 0.0))
+  (let ((view-matrix (walk camera :x x :y y :z z)))
+    (dolist (s shaders)
+      (gl:use-program s)
+      (gl:uniform-matrix-4fv (gl:get-uniform-location s "view") (marr view-matrix)))))
+
+(defparameter flashlight-active-p t)
+
+(defmethod handle-event ((event-type (eql :key-char)) event)
+  (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
+    (case keycode
+      (:up    (walk* camera :z (- camera-speed)))
+      (:down  (walk* camera :z camera-speed))
+      (:left  (walk* camera :x camera-speed))
+      (:right (walk* camera :x (- camera-speed)))
+      (:space (walk* camera :y camera-speed))
+      (:d     (walk* camera :y (- camera-speed)))
+      (:f     (setf flashlight-active-p (not flashlight-active-p)))
+      (:escape (progn
+                 (al:set-mouse-xy display (/ width 2) (/ height 2))
+                 (setf mouse-enabled (not mouse-enabled)))))))
+
+(defmethod handle-event ((event-type (eql :mouse-axis)) event)
+  (when mouse-enabled
+    (let* ((x (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dx))
+           (y (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dy))
+           (sensitivity 0.2)
+           (x-offset (* sensitivity x))
+           (y-offset (* sensitivity y))
+           (view-matrix (look-around camera x-offset y-offset)))
+      (dolist (s shaders)
+        (gl:use-program s)
+        (gl:uniform-matrix-4fv (gl:get-uniform-location s "view") (marr view-matrix)))
+      (al:set-mouse-xy display (/ width 2) (/ height 2)))))
+
+(defmethod handle-event ((event-type (eql :display-close)) event)
+  (format t "Display close event ~a: ~a~%" event-type event)
+  (error "Display closed"))
+
+(defmethod handle-event ((event-type t) event)
+  )
 
 (defun mainloop ()
   (init)
   (loop
     (with-simple-restart (next-iteration "Continue")
+      (process-input)
       (render))))
 
 (defvar mainloop-thread (bt:make-thread #'mainloop))
