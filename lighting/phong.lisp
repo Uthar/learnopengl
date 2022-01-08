@@ -10,8 +10,8 @@
   (let ((model (m*
                 (mtranslation (vec3 x y z))
                 (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
-                (mrotation +vx+ (degree->radian -65.0))
-                (mrotation +vz+ (degree->radian -45.0))
+                ;; (mrotation +vx+ (degree->radian -65.0))
+                ;; (mrotation +vz+ (degree->radian -45.0))
                 (mscaling (vec3 1.7 1.7 1.7))
                 )))
     (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "model")
