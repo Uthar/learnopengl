@@ -1,9 +1,25 @@
 (in-package :learnopengl)
 
-(defparameter light-pos (vec3 0.6 0.4 0.7))
+(defparameter light-pos (vec3 1.6 -0.0 -4.7))
 (defparameter camera-position (vec3 0 0 3))
 (defparameter camera-direction (vec3 0 0 2))
 (defparameter camera-up +vy+)
+
+(defun draw-box (x y z)
+  "Draw a big box at (x, y, z) world coordinates"
+  (let ((model (m*
+                (mtranslation (vec3 x y z))
+                (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
+                (mrotation +vx+ (degree->radian -65.0))
+                (mrotation +vz+ (degree->radian -45.0))
+                (mscaling (vec3 1.7 1.7 1.7))
+                )))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "model")
+                           (marr model))
+    (gl:uniform-matrix-3fv (gl:get-uniform-location big-cube-shader "normal")
+                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
+  (gl:bind-vertex-array big-cube)
+  (gl:draw-arrays :triangles 0 36))
 
 (defun render ()
   (gl:clear-color 0.1 0.1 0.1 1.0)
@@ -31,18 +47,6 @@
   (gl:use-program 0)
 
   (gl:use-program big-cube-shader)
-  (let ((model (m*
-                (meye 4)
-                (mtranslation (vec3 -0.5 0.0 -1.2))
-                (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
-                (mrotation +vx+ (degree->radian -65.0))
-                (mrotation +vz+ (degree->radian -45.0))
-                (mscaling (vec3 1.7 1.7 1.7))
-                )))
-    (gl:uniform-matrix-4fv (gl:get-uniform-location big-cube-shader "model")
-                           (marr model))
-    (gl:uniform-matrix-3fv (gl:get-uniform-location big-cube-shader "normal")
-                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
 
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "viewPos") (varr3 camera-position))
 
@@ -65,8 +69,14 @@
 
   (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
 
-  (gl:bind-vertex-array big-cube)
-  (gl:draw-arrays :triangles 0 36)
+  (draw-box -0.5 0 -6.2)
+  (draw-box -5.5 1.9 -12.2)
+  (draw-box -3.4 -2 -7.7)
+  (draw-box 3.5 3.6 -20.0)
+  (draw-box 0.2 4.9 -14.5)
+  (draw-box -3.1 3.9 -10.2)
+  (draw-box 1.5 -2.9 -8.8)
+
   (gl:bind-vertex-array 0)
   (gl:use-program 0)
 
@@ -86,13 +96,14 @@
    (gl:delete-vertex-arrays (list big-cube))
    (gl:delete-buffers (list big-cube))
    (gl:delete-texture container-diffuse-map)
-   (gl:delete-texture container-specular-map))
+   (gl:delete-texture container-specular-map)
+   (gl:delete-texture container-emission-map))
 
   (defparameter light-cube-shader (shader "./vs.vert" "./light-cube.frag"))
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
   (defparameter container-diffuse-map (texture "container2.png"))
   (defparameter container-specular-map (texture "container2_specular.png"))
-  (defparameter container-emission-map (texture "emission.png"))
+  (defparameter container-emission-map (texture "matrix.jpg"))
   (defparameter big-cube (cube))
   (defparameter light-cube (cube))
 

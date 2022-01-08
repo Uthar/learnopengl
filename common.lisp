@@ -91,5 +91,6 @@
 
 
 (defun varr3 (v)
-  (declare (optimize speed))
+  (declare (optimize speed)
+           (type vec3 v))
   (vector (vx3 v) (vy3 v) (vz3 v)))
