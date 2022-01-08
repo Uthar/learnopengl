@@ -185,7 +185,9 @@
               (cffi:foreign-slot-value event '(:struct al:any-event) 'type)
               event))))
 
-(defparameter camera-speed 0.25)
+(defparameter walk-speed 0.20)
+
+(defparameter *walking* nil)
 
 (defun walk* (camera &key (x 0.0) (y 0.0) (z 0.0))
   (let ((view-matrix (walk camera :x x :y y :z z)))
@@ -195,25 +197,47 @@
 
 (defparameter flashlight-active-p t)
 
+(defmethod handle-event ((event-type (eql :key-down)) event)
+  (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
+    (case keycode
+      (:w (pushnew :front *walking*))
+      (:s (pushnew :back *walking*))
+      (:d (pushnew :left *walking*))
+      (:a (pushnew :right *walking*))
+      (:space (pushnew :up *walking*))
+      (:v     (pushnew :down *walking*)))))
+
+(defmethod handle-event ((event-type (eql :key-up)) event)
+  (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
+    (case keycode
+      (:w (removef *walking* :front))
+      (:s (removef *walking* :back))
+      (:d (removef *walking* :left))
+      (:a (removef *walking* :right))
+      (:space (removef *walking* :up))
+      (:v     (removef *walking* :down)))))
+
 (defmethod handle-event ((event-type (eql :key-char)) event)
   (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
     (case keycode
-      (:up    (walk* camera :z (- camera-speed)))
-      (:down  (walk* camera :z camera-speed))
-      (:left  (walk* camera :x camera-speed))
-      (:right (walk* camera :x (- camera-speed)))
-      ;; (:space (walk* camera :y camera-speed))
-      ;; (:d     (walk* camera :y (- camera-speed)))
       (:f     (setf flashlight-active-p (not flashlight-active-p)))
       (:escape (progn
                  (al:set-mouse-xy display (/ width 2) (/ height 2))
                  (setf mouse-enabled (not mouse-enabled)))))))
 
+(defun simulate-game ()
+  (when (member :front *walking*) (walk* camera :z (- walk-speed)))
+  (when (member :back  *walking*) (walk* camera :z (+ walk-speed)))
+  (when (member :left  *walking*) (walk* camera :x (- walk-speed)))
+  (when (member :right *walking*) (walk* camera :x (+ walk-speed)))
+  (when (member :up    *walking*) (walk* camera :y (+ walk-speed)))
+  (when (member :down  *walking*) (walk* camera :y (- walk-speed))))
+
 (defmethod handle-event ((event-type (eql :mouse-axis)) event)
   (when mouse-enabled
     (let* ((x (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dx))
            (y (cffi:foreign-slot-value event '(:struct al:mouse-event) 'al::dy))
-           (sensitivity 0.2)
+           (sensitivity 0.15)
            (x-offset (* sensitivity x))
            (y-offset (* sensitivity y))
            (view-matrix (look-around camera x-offset y-offset)))
@@ -235,6 +259,7 @@
   (loop
     (with-simple-restart (next-iteration "Continue")
       (process-input)
+      (simulate-game)
       (render))))
 
 (defvar mainloop-thread (bt:make-thread #'mainloop))
