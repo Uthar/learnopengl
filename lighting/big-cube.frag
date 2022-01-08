@@ -17,6 +17,7 @@ struct Light {
   vec3 position;
   vec3 direction;
   float cutoff;
+  float outer;
   vec3 ambient;
   vec3 diffuse;
   vec3 specular;
@@ -49,11 +50,15 @@ void main() {
   //   emission = 1.0 * (1 + sin(2.8 * time)) * texture(material.emission, fragTexCoords + vec2(0.0, -time)).rgb;
   // }
 
-  float theta = dot(normalize(light.position - fragPos), normalize(light.direction));
+  float theta = dot(lightDir, normalize(light.direction));
+  float epsilon = light.cutoff - light.outer;
+  float intensity = clamp((theta  - light.outer) / epsilon, 0.0, 1.0);
 
   vec3 color = ambient + emission;
 
-  if (theta > light.cutoff) {
+  if (theta > light.outer) {
+    diffuse *= intensity;
+    specular *= intensity;
     color = (ambient + diffuse + specular + emission);
   }
 
