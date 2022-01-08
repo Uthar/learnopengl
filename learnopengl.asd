@@ -13,4 +13,5 @@
   :components ((:file "common")
                (:file "shader")
                (:file "3d")
-               (:file "texture")))
+               (:file "texture")
+               (:file "camera")))
