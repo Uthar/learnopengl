@@ -44,7 +44,7 @@ void main() {
 
   vec3 emission = vec3(0.0);
   if (specularTexColor == vec3(0.0)) {
-    emission = texture(material.emission, fragTexCoords + vec2(0, -1.5 * time)).rgb;
+    emission = 1.0 * (1 + sin(2.8 * time)) * texture(material.emission, fragTexCoords).rgb;
   }
 
   vec3 color = ambient + diffuse + specular + emission;

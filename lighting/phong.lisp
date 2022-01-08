@@ -1,6 +1,6 @@
 (in-package :learnopengl)
 
-(defparameter light-pos (vec3 1.0 0.4 0.7))
+(defparameter light-pos (vec3 0.6 0.4 0.7))
 (defparameter camera-position (vec3 0 0 3))
 (defparameter camera-direction (vec3 0 0 2))
 (defparameter camera-up +vy+)
@@ -33,7 +33,7 @@
   (gl:use-program big-cube-shader)
   (let ((model (m*
                 (meye 4)
-                (mtranslation (vec3 0.0 0.0 -1.2))
+                (mtranslation (vec3 -0.5 0.0 -1.2))
                 (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
                 (mrotation +vx+ (degree->radian -65.0))
                 (mrotation +vz+ (degree->radian -45.0))
@@ -92,7 +92,7 @@
   (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
   (defparameter container-diffuse-map (texture "container2.png"))
   (defparameter container-specular-map (texture "container2_specular.png"))
-  (defparameter container-emission-map (texture "matrix.jpg"))
+  (defparameter container-emission-map (texture "emission.png"))
   (defparameter big-cube (cube))
   (defparameter light-cube (cube))
 
