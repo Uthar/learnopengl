@@ -15,12 +15,11 @@ struct Material {
 
 struct Light {
   vec3 position;
+  vec3 direction;
+  float cutoff;
   vec3 ambient;
   vec3 diffuse;
   vec3 specular;
-  float constant;
-  float linear;
-  float quadratic;
 };
 
 uniform vec3 viewPos;
@@ -29,10 +28,6 @@ uniform Material material;
 uniform Light light;
 
 void main() {
-
-  float distance    = length(light.position - fragPos);
-  float attenuation = 1.0 / (light.constant + light.linear * distance +
-                             light.quadratic * (distance * distance));
 
   vec3 diffuseTexColor = vec3(texture(material.diffuse, fragTexCoords));
   vec3 ambient = light.ambient * diffuseTexColor;
@@ -54,6 +49,13 @@ void main() {
   //   emission = 1.0 * (1 + sin(2.8 * time)) * texture(material.emission, fragTexCoords + vec2(0.0, -time)).rgb;
   // }
 
-  vec3 color = attenuation * (ambient + diffuse + specular + emission);
+  float theta = dot(normalize(light.position - fragPos), normalize(light.direction));
+
+  vec3 color = ambient + emission;
+
+  if (theta > light.cutoff) {
+    color = (ambient + diffuse + specular + emission);
+  }
+
   fragColor = vec4(color, 1.0);
 }

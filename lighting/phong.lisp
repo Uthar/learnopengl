@@ -62,7 +62,9 @@
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.emission") 2)
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 light-pos))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 camera-position))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.direction") (varr3 camera-direction))
+  (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.cutoff") (cos (degree->radian 12.5)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.specular") (vector 0.5 0.5 0.5))
