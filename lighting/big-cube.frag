@@ -107,7 +107,7 @@ vec3 calcSpotLight(SpotLight light, vec3 viewDirection, vec3 normal, vec3 positi
   vec3 ambient = light.ambient * diffuseTexColor;
 
   if (theta < light.outer) {
-    return ambient;
+    return vec3(0.0);
   };
 
   vec3 specularTexColor = vec3(texture(material.specular, fragTexCoords));
