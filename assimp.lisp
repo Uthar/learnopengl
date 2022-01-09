@@ -146,7 +146,7 @@
      (let ((id (gl:gen-texture)))
        (multiple-value-bind (bytes width height format) (read-image pathname)
          (gl:bind-texture :texture-2d id)
-         (gl:tex-image-2d :texture-2d 0 format width height 0 format :unsigned-byte bytes)
+         (gl:tex-image-2d :texture-2d 0 (format-bytes-per-pixel format) width height 0 format :unsigned-byte bytes)
          (gl:generate-mipmap :texture-2d)
          (gl:tex-parameter :texture-2d :texture-wrap-s :repeat)
          (gl:tex-parameter :texture-2d :texture-wrap-t :repeat)

@@ -6,7 +6,7 @@
   (multiple-value-bind (bytes width height format) (read-image path)
     (let ((texture (gl:gen-texture)))
       (gl:bind-texture :texture-2d texture)
-      (gl:tex-image-2d :texture-2d 0 format width height 0 format :unsigned-byte bytes)
+      (gl:tex-image-2d :texture-2d 0 (format-bytes-per-pixel format) width height 0 format :unsigned-byte bytes)
       (gl:generate-mipmap :texture-2d)
       (gl:bind-texture :texture-2d 0)
       texture)))
@@ -42,8 +42,9 @@
 
 (defun format-bytes-per-pixel (format)
   (case format
-    (:rgb 3)
-    (:rgba 4)))
+    ((:rgb :bgr) 3)
+    (:rgba 4)
+    (t (error "Format ~a not supported" format))))
 
 (defun read-image-png (path)
   (let*
@@ -67,5 +68,5 @@
   (case format
     (:truecolor :rgb)
     (:truecolor-alpha :rgba)
-    (:ycbcr-rgb :rgb)
+    (:ycbcr-rgb :bgr)
     (t (error "Format ~a not supported" format))))
