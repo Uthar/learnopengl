@@ -9,9 +9,11 @@
                :3d-vectors
                :cl-jpeg
                :png-read
+               :classimp
                )
   :components ((:file "common")
                (:file "shader")
                (:file "3d")
                (:file "texture")
-               (:file "camera")))
+               (:file "camera")
+               (:file "assimp")))

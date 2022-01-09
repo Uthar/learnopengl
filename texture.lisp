@@ -11,11 +11,39 @@
       (gl:bind-texture :texture-2d 0)
       texture)))
 
-(defun read-image (path)
-  (switch ((pathname-type path) :test #'string=)
-    ("jpg" (read-image-jpeg path))
-    ("png" (read-image-png path))
-    (t (error "Format ~a not supported" (pathname-type path)))))
+(defun flip-image-vertically (bytes width height format)
+  (values
+   (flip-vector-vertically bytes height (* width 3))
+   width
+   height
+   format))
+
+(defun flip-vector-vertically (vector height width)
+  (loop with flipped = (make-array (array-total-size vector)
+                                   :element-type (array-element-type vector))
+        for row1 from 0 upto (1- height)
+        for row2 from (1- height) downto 0
+        do (loop for pixel from 0 upto (1- width)
+                 do (setf (aref flipped (+ (* row1 width) pixel))
+                          (aref vector (+ (* row2 width) pixel))))
+        finally (return flipped)))
+
+(defun read-image (path &key (flip t))
+  (multiple-value-bind (bytes width height format)
+      (switch ((pathname-type path) :test #'string=)
+        ("jpg" (read-image-jpeg path))
+        ("png" (read-image-png path))
+        (t (error "Format ~a not supported" (pathname-type path))))
+    (values
+     (if flip
+         (flip-vector-vertically bytes height (* (format-bytes-per-pixel format) width))
+         bytes)
+     width height format)))
+
+(defun format-bytes-per-pixel (format)
+  (case format
+    (:rgb 3)
+    (:rgba 4)))
 
 (defun read-image-png (path)
   (let*

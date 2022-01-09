@@ -94,3 +94,16 @@
   (declare (optimize speed)
            (type vec3 v))
   (vector (vx3 v) (vy3 v) (vz3 v)))
+
+(defmacro dovec ((var vec) &rest body)
+  `(loop for ,var across ,vec
+         do ,@body))
+
+
+
+(defun info (format-string &rest args)
+  (apply #'format `(t ,(uiop:strcat format-string "~%") ,@args)))
+
+
+(defun vector* (&rest elems)
+  (make-array (length elems) :adjustable t :fill-pointer 0 :initial-contents elems))

@@ -9,6 +9,7 @@ mkShell {
       _3d-vectors
       png-read
       cl-jpeg
+      classimp
     ]))
   ];
 }

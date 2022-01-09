@@ -83,10 +83,7 @@
   (gl:uniformi (gl:get-uniform-location big-cube-shader "material.emission") 2)
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "material.shininess") 32.0)
 
-  ;; (gl:uniformfv (gl:get-uniform-location big-cube-shader "light.position") (varr3 camera-position))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.direction") (vector -0.3 -1.0 -1.0))
-  ;; (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.cutoff") (cos (degree->radian 12.5)))
-  ;; (gl:uniformf  (gl:get-uniform-location big-cube-shader "light.outer") (cos (degree->radian 18.5)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.ambient") (vector 0.2 0.2 0.2))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "dirLight.specular") (vector 0.5 0.5 0.5))
@@ -124,7 +121,7 @@
 
   (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
 
-  (draw-box -0.5 0 -6.2)
+  ;; (draw-box -0.5 0 -6.2)
   (draw-box -5.5 1.9 -12.2)
   (draw-box -3.4 -2 -7.7)
   (draw-box 3.5 3.6 -20.0)
@@ -134,6 +131,66 @@
 
   (gl:bind-vertex-array 0)
   (gl:use-program 0)
+
+
+
+  (gl:use-program backpack-shader)
+
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "material.shininess") 32.0)
+
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "dirLight.direction") (vector -0.3 -1.0 -1.0))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "dirLight.ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "dirLight.diffuse") (vector 1.0 1.0 1.0))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "dirLight.specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[0].position") (varr3 light-pos))
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[0].constant")  1.0)
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[0].linear")    0.220)
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[0].quadratic") 0.20)
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[0].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[0].diffuse") light-color)
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[0].specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[1].position") (varr3 light-2-pos))
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[1].constant")  1.0)
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[1].linear")    0.220)
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "pointLights[1].quadratic") 0.20)
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[1].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[1].diffuse") light-2-color)
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "pointLights[1].specular") (vector 0.5 0.5 0.5))
+
+  (gl:uniformi  (gl:get-uniform-location backpack-shader "numPointLights") 2)
+
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].position") (varr3 (slot-value camera 'position)))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].direction") (varr3 (slot-value camera 'direction)))
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "spotLights[0].cutoff") (cos (degree->radian 8.5)))
+  (gl:uniformf  (gl:get-uniform-location backpack-shader "spotLights[0].outer") (cos (degree->radian 9.5)))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
+
+  (if flashlight-active-p
+      (gl:uniformi  (gl:get-uniform-location backpack-shader "numSpotLights") 1)
+      (gl:uniformi  (gl:get-uniform-location backpack-shader "numSpotLights") 0))
+
+  (gl:uniformf (gl:get-uniform-location backpack-shader "time") (al:get-time))
+
+  (let ((model (m*
+                (mtranslation (vec3 0 0 -12))
+                (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
+                ;; (mrotation +vx+ (degree->radian -65.0))
+                ;; (mrotation +vz+ (degree->radian -45.0))
+                (mscaling (vec3 1.0 1.0 1.0))
+                )))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location backpack-shader "model")
+                           (marr model))
+    (gl:uniform-matrix-3fv (gl:get-uniform-location backpack-shader "normal")
+                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
+
+  (draw backpack backpack-shader)
+  (gl:use-program 0)
+
+
 
   (al:flip-display)
   (sleep 1/60))
@@ -149,6 +206,7 @@
   (ignore-errors
    (gl:delete-program light-cube-shader)
    (gl:delete-program big-cube-shader)
+   (gl:delete-program backpack-shader)
    (gl:delete-vertex-arrays (list light-cube))
    (gl:delete-buffers (list light-cube))
    (gl:delete-vertex-arrays (list big-cube))
@@ -157,16 +215,18 @@
    (gl:delete-texture container-specular-map)
    (gl:delete-texture container-emission-map))
 
-  (defparameter light-cube-shader (shader "./vs.vert" "./light-cube.frag"))
-  (defparameter big-cube-shader (shader "./vs.vert" "./big-cube.frag"))
-  (defparameter shaders (list light-cube-shader big-cube-shader))
-  (defparameter container-diffuse-map (texture "container2.png"))
-  (defparameter container-specular-map (texture "container2_specular.png"))
-  (defparameter container-emission-map (texture "matrix.jpg"))
+  (defparameter light-cube-shader (shader "lighting/vs.vert" "lighting/light-cube.frag"))
+  (defparameter big-cube-shader (shader "lighting/vs.vert" "lighting/big-cube.frag"))
+  (defparameter backpack-shader (shader "lighting/vs.vert" "lighting/backpack.frag"))
+  (defparameter shaders (list light-cube-shader big-cube-shader backpack-shader))
+  (defparameter container-diffuse-map (texture "lighting/container2.png"))
+  (defparameter container-specular-map (texture "lighting/container2_specular.png"))
+  (defparameter container-emission-map (texture "lighting/matrix.jpg"))
   (defparameter big-cube (cube))
   (defparameter light-cube (cube))
   (defparameter camera (camera 0 0 3))
   (defparameter mouse-enabled nil)
+  (defvar backpack (make-instance 'model :path "assets/backpack/backpack.obj"))
 
   (let ((view (view-matrix camera))
         (projection (mperspective (slot-value camera 'zoom) (/ width height) 0.1 100.0)))
@@ -250,7 +310,7 @@
   (error "Display closed"))
 
 (defmethod handle-event ((event-type t) event)
-  (format t "Unknown event type ~a: ~a~%" event-type event)
+  ;; (format t "Unknown event type ~a: ~a~%" event-type event)
   )
 
 (defun mainloop ()
@@ -261,7 +321,11 @@
       (simulate-game)
       (render))))
 
-(defvar mainloop-thread (bt:make-thread #'mainloop))
+(defvar mainloop-thread nil)
+
+(defun start ()
+  (create-context)
+  (reset))
 
 (defun reset ()
   (ignore-errors (bt:destroy-thread mainloop-thread))
