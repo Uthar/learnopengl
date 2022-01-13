@@ -39,7 +39,7 @@
  #-win32 "phong"
  #+win32 "phong.exe"
 
- :toplevel #'learnopengl::start
+ :toplevel #'learnopengl::phong
  :executable t
 
  #+sb-core-compression :compression

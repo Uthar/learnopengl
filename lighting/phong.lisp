@@ -5,6 +5,10 @@
 (defparameter light-2-pos (vec3 1.6 -0.0 -4.7))
 (defparameter light-2-color (vector 7.0 0.0 0.0))
 
+;; TODO optimizations:
+;; - cache uniform locations
+;; - disable cl-opengl error checking
+;; -
 (defun draw-box (x y z)
   "Draw a big box at (x, y, z) world coordinates"
   (let ((model (m*
@@ -330,3 +334,7 @@
 (defun reset ()
   (ignore-errors (bt:destroy-thread mainloop-thread))
   (setf mainloop-thread (bt:make-thread #'mainloop)))
+
+(defun phong ()
+  (start)
+  (bt:join-thread mainloop-thread))

@@ -48,11 +48,11 @@ uniform DirLight dirLight;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
-#define MAX_POINT_LIGHTS 128
+#define MAX_POINT_LIGHTS 2
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int numPointLights;
 
-#define MAX_SPOT_LIGHTS 128
+#define MAX_SPOT_LIGHTS 1
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform int numSpotLights;
 

@@ -45,11 +45,11 @@ uniform float time;
 uniform Material material;
 uniform DirLight dirLight;
 
-#define MAX_POINT_LIGHTS 128
+#define MAX_POINT_LIGHTS 2
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int numPointLights;
 
-#define MAX_SPOT_LIGHTS 128
+#define MAX_SPOT_LIGHTS 1
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform int numSpotLights;
 

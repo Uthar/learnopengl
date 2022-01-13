@@ -9,7 +9,7 @@
 
 (defun init-display (&key (x 800) (y 600))
   (al:init)
-  (al:set-new-display-flags '(:windowed :resizable :opengl))
+  (al:set-new-display-flags '(:windowed :opengl))
   (al:set-new-display-option :vsync 0 :require)
 
   ;; OpenGL does not guarantee a depth buffer by default.
