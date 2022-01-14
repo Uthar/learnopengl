@@ -170,25 +170,57 @@
     (with-slots (vao indices textures) mesh
       (gl:bind-vertex-array vao)
 
-      (loop
-        for texture across textures
-        for i fixnum from 0
-        for type of-type simple-string = (texture-type texture)
-        do
-           (gl:active-texture i)
-           (switch (type :test #'string=)
-             ("texture_diffuse"  (setf id (incf diffuse)))
-             ("texture_specular" (setf id (incf specular)))
-             ("texture_normal"   (setf id (incf normal)))
-             ("texture_height"   (setf id (incf height))))
+      (let ((ids (map 'vector #'texture-id textures))
+            (id -1)
+            (i -1))
 
-           ;; FIXME Seriously this is taking 50% of the cpu?
-           (gl:uniformi (gl:get-uniform-location shader
-                                                 ;; (format nil "~a~a" (texture-type texture) id))
-                                                 (concatenate 'string type (vector (code-char (+ 48 i)))))
-                        i)
+        (gl:active-texture (incf i))
+        (gl:bind-texture :texture-2d (aref ids (incf id)))
+        (gl:uniformi (gl:get-uniform-location shader "texture_diffuse1") i)
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_diffuse2") 0)
 
-           (gl:bind-texture :texture-2d (texture-id texture)))
+        (gl:active-texture (incf i))
+        (gl:bind-texture :texture-2d (aref ids (incf id)))
+        (gl:uniformi (gl:get-uniform-location shader "texture_specular1") i))
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_specular2") 0)
+
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_normal1") 0)
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_normal2") 0)
+
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_height1") 0)
+        ;; (gl:active-texture (incf i))
+        ;; (gl:bind-texture :texture-2d (aref ids (incf i)))
+        ;; (gl:uniformi (gl:get-uniform-location shader "texture_height2") 0)
+
+      ;; (loop
+      ;;   for texture across textures
+      ;;   for i fixnum from 0
+      ;;   for type of-type simple-string = (texture-type texture)
+      ;;   do
+      ;;      (gl:active-texture i)
+      ;;      (switch (type :test #'string=)
+      ;;        ("texture_diffuse"  (setf id (incf diffuse)))
+      ;;        ("texture_specular" (setf id (incf specular)))
+      ;;        ("texture_normal"   (setf id (incf normal)))
+      ;;        ("texture_height"   (setf id (incf height))))
+
+      ;;      ;; FIXME Seriously this is taking 50% of the cpu?
+      ;;      (gl:uniformi (gl:get-uniform-location shader
+      ;;                                            ;; (format nil "~a~a" (texture-type texture) id))
+      ;;                                            (concatenate 'string type (vector (code-char (+ 48 i)))))
+      ;;                   i)
+
+      ;;      (gl:bind-texture :texture-2d (texture-id texture)))
 
       (gl:draw-elements :triangles
                         (gl:make-null-gl-array :unsigned-int)

@@ -67,6 +67,8 @@
 (defun map-format (format)
   (case format
     (:truecolor :rgb)
+    (:indexed-colour :rgb)
+    ;; FIXME not sure
     (:truecolor-alpha :rgba)
     (:ycbcr-rgb :bgr)
     (t (error "Format ~a not supported" format))))

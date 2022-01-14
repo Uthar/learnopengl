@@ -115,7 +115,7 @@
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].cutoff") (cos (degree->radian 8.5)))
   (gl:uniformf  (gl:get-uniform-location big-cube-shader "spotLights[0].outer") (cos (degree->radian 9.5)))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
-  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
+  (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location big-cube-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
 
   (if flashlight-active-p
@@ -170,7 +170,7 @@
   (gl:uniformf  (gl:get-uniform-location backpack-shader "spotLights[0].cutoff") (cos (degree->radian 8.5)))
   (gl:uniformf  (gl:get-uniform-location backpack-shader "spotLights[0].outer") (cos (degree->radian 9.5)))
   (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].ambient") (vector 0.2 0.2 0.2))
-  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].diffuse") (vector 1.5 1.5 1.5))
+  (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].diffuse") (vector 1.0 1.0 1.0))
   (gl:uniformfv (gl:get-uniform-location backpack-shader "spotLights[0].specular") (vector 0.5 0.5 0.5))
 
   (if flashlight-active-p
@@ -180,20 +180,47 @@
   (gl:uniformf (gl:get-uniform-location backpack-shader "time") (al:get-time))
 
   (let ((model (m*
-                (mtranslation (vec3 0 0 -12))
+                (mtranslation (vec3 0 -5 -15))
                 (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
-                ;; (mrotation +vx+ (degree->radian -65.0))
+                ;; (mrotation +vx+ (degree->radian -90.0))
                 ;; (mrotation +vz+ (degree->radian -45.0))
-                (mscaling (vec3 1.0 1.0 1.0))
+                (mscaling (vec3 0.5 0.5 0.5))
                 )))
     (gl:uniform-matrix-4fv (gl:get-uniform-location backpack-shader "model")
                            (marr model))
     (gl:uniform-matrix-3fv (gl:get-uniform-location backpack-shader "normal")
                            (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
+  ;; (draw old-car backpack-shader)
+  ;; (draw backpack backpack-shader)
+  (draw nanosuit backpack-shader)
 
-  (draw backpack backpack-shader)
+  (let ((model (m*
+                (mtranslation (vec3 -5 -5 -15))
+                (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
+                ;; (mrotation +vx+ (degree->radian -90.0))
+                ;; (mrotation +vz+ (degree->radian -45.0))
+                (mscaling (vec3 0.5 0.5 0.5))
+                )))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location backpack-shader "model")
+                           (marr model))
+    (gl:uniform-matrix-3fv (gl:get-uniform-location backpack-shader "normal")
+                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
+  (draw nanosuit backpack-shader)
+
+  (let ((model (m*
+                (mtranslation (vec3 +5 -5 -15))
+                (mrotation +vy+ (- (degree->radian (coerce (* 20 (al:get-time)) 'single-float))))
+                ;; (mrotation +vx+ (degree->radian -90.0))
+                ;; (mrotation +vz+ (degree->radian -45.0))
+                (mscaling (vec3 0.5 0.5 0.5))
+                )))
+    (gl:uniform-matrix-4fv (gl:get-uniform-location backpack-shader "model")
+                           (marr model))
+    (gl:uniform-matrix-3fv (gl:get-uniform-location backpack-shader "normal")
+                           (marr (mblock (mtranspose (minv model)) 0 0 3 3))))
+  (draw nanosuit backpack-shader)
+
   (gl:use-program 0)
-
 
 
   (al:flip-display)
@@ -231,6 +258,7 @@
   (defparameter camera (camera 0 0 3))
   (defparameter mouse-enabled nil)
   (defvar backpack (make-instance 'model :path "assets/backpack/backpack.obj"))
+  (defvar nanosuit (make-instance 'model :path "assets/nanosuit/nanosuit.obj"))
 
   (let ((view (view-matrix camera))
         (projection (mperspective (slot-value camera 'zoom) (/ width height) 0.1 100.0)))
