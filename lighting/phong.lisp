@@ -222,9 +222,7 @@
 
   (gl:use-program 0)
 
-
-  (al:flip-display)
-  (sleep 1/60))
+  (al:flip-display))
 
 (defparameter width 800)
 (defparameter height 600)
@@ -345,13 +343,17 @@
   ;; (format t "Unknown event type ~a: ~a~%" event-type event)
   )
 
+(defun game-sleep ()
+  (sleep 1/60))
+
 (defun mainloop ()
   (init)
   (loop
     (with-simple-restart (next-iteration "Continue")
       (process-input)
       (simulate-game)
-      (render))))
+      (render)
+      (game-sleep))))
 
 (defvar mainloop-thread nil)
 
