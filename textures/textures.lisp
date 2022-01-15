@@ -72,7 +72,7 @@ void main() {
   (gl:use-program program)
   (gl:uniform-matrix-4fv
    (gl:get-uniform-location program "transform")
-   (->> (m* 
+   (->> (m*
      (mtranslation (vec (* 0.5 (sin (al:get-time)))
                         (* 0.5 (cos (al:get-time)))
                         (truncate (sin (al:get-time)))))
@@ -86,7 +86,7 @@ void main() {
      (mscaling (vec 0.8 0.8 0.8))
      )
     marr))
-            
+
   (gl:draw-elements :triangles (gl:make-null-gl-array :unsigned-int) :count 6)
   (al:flip-display)
   (sleep 1/60)
@@ -118,14 +118,14 @@ void main() {
   (gl:tex-image-2d :texture-2d 0 :rgb 100 100 0 :rgba :unsigned-byte pyramid-raw)
   (gl:generate-mipmap :texture-2d)
 
-  (setf vao (gl:create-vertex-array))
+  (setf vao (gl:gen-vertex-array))
   (gl:bind-vertex-array vao)
 
-  (setf ebo (gl:create-buffer))
+  (setf ebo (gl:gen-buffer))
   (gl:bind-buffer :element-array-buffer ebo)
   (gl:buffer-data :element-array-buffer :static-draw indices)
 
-  (setf vbo (gl:create-buffer))
+  (setf vbo (gl:gen-buffer))
   (gl:bind-buffer :array-buffer vbo)
   (gl:buffer-data :array-buffer :static-draw vertices)
   (gl:vertex-attrib-pointer 0 3 :float nil (* 5 (cffi:foreign-type-size :float)) 0)

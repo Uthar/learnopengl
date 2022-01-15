@@ -13,9 +13,9 @@
   ((vertices :initarg :vertices :initform (vector*))
    (indices  :initarg :indices  :initform (vector*))
    (textures :initarg :textures :initform (vector*))
-   (vao :initform (gl:create-vertex-array))
-   (vbo :initform (gl:create-buffer))
-   (ebo :initform (gl:create-buffer))))
+   (vao :initform (gl:gen-vertex-array))
+   (vbo :initform (gl:gen-buffer))
+   (ebo :initform (gl:gen-buffer))))
 
 (defmethod initialize-instance :after ((mesh mesh) &key)
   (info "initialize instance of mesh")

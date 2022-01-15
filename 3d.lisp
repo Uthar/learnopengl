@@ -1,8 +1,8 @@
 (in-package :learnopengl)
 
 (defun cube ()
-  (let* ((vao (gl:create-vertex-array))
-         (vbo (gl:create-buffer))
+  (let* ((vao (gl:gen-vertex-array))
+         (vbo (gl:gen-buffer))
          (vertices
                    ;; positions    ;; normals     ;; texture coords
            (vector -0.5 -0.5 -0.5  0.0  0.0 -1.0  0.0 0.0
