@@ -370,5 +370,5 @@
   (setf mainloop-thread (bt:make-thread #'mainloop)))
 
 (defun phong ()
-  (start)
-  (bt:join-thread mainloop-thread))
+  (create-context)
+  (mainloop))
