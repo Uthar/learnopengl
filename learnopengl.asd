@@ -12,6 +12,7 @@
                :classimp
                )
   :components ((:file "common")
+               (:file "rsqrt")
                (:file "shader")
                (:file "3d")
                (:file "texture")
