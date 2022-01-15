@@ -125,7 +125,7 @@
 
   (gl:uniformf (gl:get-uniform-location big-cube-shader "time") (al:get-time))
 
-  ;; (draw-box -0.5 0 -6.2)
+  (draw-box -0.5 0 -6.2)
   (draw-box -5.5 1.9 -12.2)
   (draw-box -3.4 -2 -7.7)
   (draw-box 3.5 3.6 -20.0)
@@ -304,6 +304,10 @@
       (:a (removef *walking* :right))
       (:space (removef *walking* :up))
       (:v     (removef *walking* :down)))))
+
+;; Prevent keep walking after mouse out of window
+(defmethod handle-event ((event-type (eql :display-switch-out)) event)
+  (setf *walking* nil))
 
 (defmethod handle-event ((event-type (eql :key-char)) event)
   (let ((keycode (cffi:foreign-slot-value event '(:struct al:keyboard-event) 'al::keycode)))
