@@ -100,6 +100,8 @@
          do ,@body))
 
 
+(defun mapv (fn vec)
+  (map 'vector fn vec))
 
 (defun info (format-string &rest args)
   (apply #'format `(t ,(uiop:strcat format-string "~%") ,@args)))

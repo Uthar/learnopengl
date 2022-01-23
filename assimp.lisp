@@ -1,9 +1,10 @@
-(in-package :learnopengl)
+;; Asset loading
+;;
+;; Wrappers for libassimp
+;;
+;; Not thread safe
 
-(defstruct vertex
-  position
-  normal
-  texture-coords)
+(in-package :learnopengl)
 
 (defstruct texture
   id
@@ -64,8 +65,6 @@
                 path
                 :processing-flags '(:ai-process-triangulate :ai-process-flip-u-vs))))
     (process-node model (ai:root-node scene) scene)))
-
-;; (make-instance 'model :path "/dev/null")
 
 (defun process-node (model node scene)
   (info "process-node ~A" (ai:name node))
@@ -156,9 +155,10 @@
 
 
 (defmethod draw ((model model) shader)
-    (dovec (mesh (slot-value model 'meshes))
-      (draw mesh shader)))
+  (dovec (mesh (slot-value model 'meshes))
+    (draw mesh shader)))
 
+;; FIXME: rewrite this crap...
 (defmethod draw ((mesh mesh) shader)
   (declare (optimize speed))
   (let ((diffuse 1)
@@ -170,7 +170,7 @@
     (with-slots (vao indices textures) mesh
       (gl:bind-vertex-array vao)
 
-      (let ((ids (map 'vector #'texture-id textures))
+      (let ((ids (mapv #'texture-id textures))
             (id -1)
             (i -1))
 

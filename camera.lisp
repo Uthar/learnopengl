@@ -1,3 +1,7 @@
+;; Camera system for "walking" around a scene
+;;
+;; Not thread safe.
+
 (in-package :learnopengl)
 
 (defclass camera ()
