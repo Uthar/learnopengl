@@ -11,6 +11,7 @@
       (gl:bind-texture :texture-2d 0)
       texture)))
 
+;; FIXME: Unused
 (defun flip-image-vertically (bytes width height format)
   (values
    (flip-vector-vertically bytes height (* width (format-bytes-per-pixel format)))
