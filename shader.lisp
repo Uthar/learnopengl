@@ -1,3 +1,5 @@
+;; Shader compilation.
+
 (in-package :learnopengl)
 
 (defun link-shader-program (vs fs)

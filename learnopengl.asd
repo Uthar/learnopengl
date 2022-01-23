@@ -1,6 +1,7 @@
 
 
 (defsystem :learnopengl
+  :licence "AGPLv3"
   :depends-on (
                :alexandria
                :cl-liballegro

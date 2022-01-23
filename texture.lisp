@@ -1,4 +1,4 @@
-
+;; Texture loading.
 
 (in-package :learnopengl)
 
