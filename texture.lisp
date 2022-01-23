@@ -13,7 +13,7 @@
 
 (defun flip-image-vertically (bytes width height format)
   (values
-   (flip-vector-vertically bytes height (* width 3))
+   (flip-vector-vertically bytes height (* width (format-bytes-per-pixel format)))
    width
    height
    format))
