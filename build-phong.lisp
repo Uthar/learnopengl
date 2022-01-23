@@ -20,6 +20,7 @@
   (asdf:load-system :cl-jpeg)
   (asdf:load-system :classimp))
 
+(pushnew (truename ".") asdf:*central-registry* :test #'string=)
 (asdf:load-system :phong)
 
 (cffi:close-foreign-library 'al::liballegro_acodec)

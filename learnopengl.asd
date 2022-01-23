@@ -12,6 +12,7 @@
                :classimp
                )
   :components ((:file "common")
+               #+sbcl (:file "sbcl")
                (:file "rsqrt")
                (:file "shader")
                (:file "3d")
