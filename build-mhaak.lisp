@@ -14,6 +14,7 @@
   (asdf:load-system :3d-vectors)
   (asdf:load-system :3d-matrices))
 
+(push (truename ".") asdf:*central-registry*)
 (asdf:load-system :mhaak)
 
 (cffi:close-foreign-library 'al::liballegro_acodec)
@@ -37,7 +38,7 @@
  :executable t
 
  #+sb-core-compression :compression
- #+sb-core-compression 9
+ #+sb-core-compression t
 
  #+win32 :application-type
  #+win32 :gui)
