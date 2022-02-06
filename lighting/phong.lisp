@@ -255,7 +255,6 @@
   (defparameter light-cube (cube))
   (defparameter camera (camera 0 0 3))
   (defparameter mouse-enabled nil)
-  (defvar backpack (make-instance 'model :path "assets/backpack/backpack.obj"))
   (defvar nanosuit (make-instance 'model :path "assets/nanosuit/nanosuit.obj"))
 
   (let ((view (view-matrix camera))
